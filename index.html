@@ -1,12 +1,620 @@
+elvira, [22.12.2025 21:11]
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Тест изображений</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БРАТАНЧИК, С ТВОИМ ДНЁМ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: white;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* Салют */
+        #fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* Фон с анимацией сердец */
+        #hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4081;
+            transform: rotate(45deg);
+            opacity: 0;
+            animation: float 6s linear infinite;
+        }
+
+        .heart:before, .heart:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4081;
+            border-radius: 50%;
+        }
+
+        .heart:before {
+            top: -10px;
+            left: 0;
+        }
+
+        .heart:after {
+            top: 0;
+            left: -10px;
+        }
+
+        @keyframes float {
+            0% {
+                transform: rotate(45deg) translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: rotate(45deg) translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Попап */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background: #111;
+            padding: 50px;
+            border-radius: 10px;
+            border: 2px solid #ff4081;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .popup h2 {
+            color: #ff4081;
+            margin-bottom: 40px;
+            font-size: 28px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .popup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .popup-btn {
+            background: transparent;
+            border: 2px solid #ff4081;
+            color: #ff4081;
+            padding: 15px 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .popup-btn:hover {
+            background: #ff4081;
+            color: black;
+            transform: scale(1.05);
+        }
+
+        /* Экраны */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            text-align: center;
+        }
+
+elvira, [22.12.2025 21:11]
+.screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .content {
+            max-width: 700px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 50px;
+            border-left: 4px solid #ff4081;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border-radius: 2px;
+        }
+
+        .text {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            color: #f0f0f0;
+            letter-spacing: 0.5px;
+        }
+
+        .next-btn {
+            background: transparent;
+            border: 1px solid #666;
+            color: #666;
+            padding: 12px 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            letter-spacing: 1px;
+        }
+
+        .next-btn:hover {
+            border-color: #ff4081;
+            color: #ff4081;
+            transform: scale(1.05);
+        }
+
+        .photo {
+            max-width: 320px;
+            margin: 40px auto;
+            border: 2px solid #333;
+            transition: transform 0.3s;
+            display: block;
+            border-radius: 2px;
+        }
+
+        .photo:hover {
+            transform: scale(1.03);
+            border-color: #ff4081;
+        }
+
+        .final-photo {
+            max-width: 500px;
+            margin: 40px auto;
+            border: 3px solid #ff4081;
+            border-radius: 4px;
+        }
+
+        .photo-placeholder {
+            width: 320px;
+            height: 240px;
+            background: #222;
+            border: 2px dashed #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin: 40px auto;
+            font-style: italic;
+            border-radius: 2px;
+        }
+
+        /* Номер экрана */
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: #444;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* Финальный салют */
+        .fireworks-title {
+            font-size: 48px;
+            color: #ff4081;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Тест загрузки изображений</h1>
-    <img src="img/friends.jpg" style="width: 300px;">
-    <img src="img/baby.jpg" style="width: 300px;">
-    <img src="img/bag.jpg" style="width: 300px;">
+    <!-- Салют -->
+    <div id="fireworks"></div>
+
+    <!-- Анимированный фон -->
+    <div id="hearts-bg"></div>
+
+    <!-- Попап -->
+    <div class="popup-overlay" id="popup">
+        <div class="popup">
+            <h2>ЗАКОНЧИТЬ ОБЩЕНИЕ?</h2>
+            <div class="popup-buttons">
+                <button class="popup-btn" onclick="startSite()">ДА</button>
+                <button class="popup-btn" onclick="startSite()">ДА</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран 1 -->
+    <div class="screen active" id="screen1">
+        <div class="content">
+            <p class="text">
+                братанчик, это твой самый счастливый день,<br>
+                ведь мы наконец-то заканчиваем дружбу<br>
+                и я не приду на твой др.
+            </p>
+            <button class="next-btn" onclick="nextScreen(2)">чё?</button>
+        </div>
+        <div class="page-number">1</div>
+    </div>
+
+elvira, [22.12.2025 21:11]
+<!-- Экран 2 -->
+    <div class="screen" id="screen2">
+        <div class="content">
+            <p class="text">
+                ну ладно, с днем рождения тебя!!<br><br>
+                наконец-то тебе 18 и мы спокойно сможем покупать пиво хоть каждый день.<br>
+                ходить в бар. курить кальян.<br>
+                мечты сбываются, братик.
+            </p>
+            <!-- ФОТО 1: общее фото с друзьями -->
+            <img src="img/friends.jpg" class="photo" alt="Наше общее фото">
+            <button class="next-btn" onclick="nextScreen(3)">дальше</button>
+        </div>
+        <div class="page-number">2</div>
+    </div>
+
+    <!-- Экран 3 -->
+    <div class="screen" id="screen3">
+        <div class="content">
+            <p class="text">
+                я в тотальном шоке с того, что ты уже такая взрослая
+            </p>
+            <!-- ФОТО 2: детское фото -->
+            <img src="img/baby.jpg" class="photo" alt="Детское фото">
+            <button class="next-btn" onclick="nextScreen(4)">продолжение...</button>
+        </div>
+        <div class="page-number">3</div>
+    </div>
+
+    <!-- Экран 4 (ВОСПОМИНАНИЯ часть 1) -->
+    <div class="screen" id="screen4">
+        <div class="content">
+            <p class="text">
+                я будто помню как мы в детстве играли в садике,<br>
+                а сейчас мы уже учимся в университете...
+            </p>
+            <button class="next-btn" onclick="nextScreen(5)">дальше</button>
+        </div>
+        <div class="page-number">4</div>
+    </div>
+
+    <!-- Экран 5 (ВОСПОМИНАНИЯ часть 2) -->
+    <div class="screen" id="screen5">
+        <div class="content">
+            <p class="text">
+                время безумно быстро идёт.<br>
+                чужие дети слишком быстро растут.
+            </p>
+            <button class="next-btn" onclick="nextScreen(6)">💔</button>
+        </div>
+        <div class="page-number">5</div>
+    </div>
+
+    <!-- Экран 6 -->
+    <div class="screen" id="screen6">
+        <div class="content">
+            <p class="text">
+                для тебя не секрет, что этот возраст — переход в более серьёзную,<br>
+                самостоятельную, страшную, взрослую жизнь.<br>
+                но не все так ужасно, как кажется с первого взгляда.<br><br>
+                перед тобой открывается весь мир..<br>
+                путешествуй, развивайся, достигай своих целей<br>
+                и становись той самой пиздатой версией себя.<br><br>
+                главное — не сомневайся в себе, не тормози<br>
+                и не уходи в свои страхи.
+            </p>
+            <button class="next-btn" onclick="nextScreen(7)">🥹</button>
+        </div>
+        <div class="page-number">6</div>
+    </div>
+
+    <!-- Экран 7 (БАЛЕНСИАГА) -->
+    <div class="screen" id="screen7">
+        <div class="content">
+            <p class="text">
+                дальше, хочу сказать, что ты замечательный человек.<br>
+                и я надеюсь, что в будущем, когда ты станешь очень богатой,<br>
+                ты купишь мне баленсиагу
+            </p>
+            <!-- ФОТО 3: сумка Balenciaga -->
+            <img src="img/bag.jpg" class="photo" alt="Balenciaga сумка">
+            <button class="next-btn" onclick="nextScreen(8)">и еще...</button>
+        </div>
+        <div class="page-number">7</div>
+    </div>
+
+    <!-- Экран 8 (МАК) -->
+    <div class="screen" id="screen8">
+        <div class="content">
+            <p class="text">
+                и покушать в маке
+            </p>
+            <!-- ФОТО 4: еда в Маке -->
+            <img src="img/mcdonalds.jpg" class="photo" alt="Еда в Маке">
+            <button class="next-btn" onclick="nextScreen(9)">😎</button>
+        </div>
+        <div class="page-number">8</div>
+    </div>
+
+elvira, [22.12.2025 21:11]
+<!-- Экран 9 (ЖЕЛАНИЯ - часть 1) -->
+    <div class="screen" id="screen9">
+        <div class="content">
+            <p class="text">
+                еще раз хочу тебя поздравить с днем рождения,<br>
+                с совершеннолетием.<br><br>
+                желаю тебе всего самого лучшего,
+            </p>
+            <!-- ФОТО 5: ваше фото 1 -->
+            <img src="img/me1.jpg" class="photo" alt="Мое фото 1">
+            <button class="next-btn" onclick="nextScreen(10)">и еще...</button>
+        </div>
+        <div class="page-number">9</div>
+    </div>
+
+    <!-- Экран 10 (ЖЕЛАНИЯ - часть 2) -->
+    <div class="screen" id="screen10">
+        <div class="content">
+            <p class="text">
+                хороших друзей,
+            </p>
+            <!-- ФОТО 6: ваше фото 2 -->
+            <img src="img/me2.jpg" class="photo" alt="Мое фото 2">
+            <button class="next-btn" onclick="nextScreen(11)">и...</button>
+        </div>
+        <div class="page-number">10</div>
+    </div>
+
+    <!-- Экран 11 (ЖЕЛАНИЯ - часть 3) -->
+    <div class="screen" id="screen11">
+        <div class="content">
+            <p class="text">
+                счастья, радости, успехов
+            </p>
+            <button class="next-btn" onclick="nextScreen(12)">❤️</button>
+        </div>
+        <div class="page-number">11</div>
+    </div>
+
+    <!-- Финальный экран -->
+    <div class="screen" id="screen12">
+        <div class="content">
+            <!-- ФОТО 7: финальное фото -->
+            <img src="img/final.jpg" class="final-photo" alt="Финальное фото">
+            <div class="fireworks-title">С 18</div>
+        </div>
+    </div>
+
+    <script>
+        // Создаем анимированные сердца на фоне
+        function createHearts() {
+            const bg = document.getElementById('hearts-bg');
+            const colors = ['#ff4081', '#ff79b0', '#ff4d94', '#ff0066'];
+            
+            for (let i = 0; i < 40; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                
+                heart.style.background = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.width = Math.random() * 15 + 10 + 'px';
+                heart.style.height = heart.style.width;
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+                
+                bg.appendChild(heart);
+            }
+        }
+
+elvira, [22.12.2025 21:11]
+// Функция для создания салюта
+        function createFirework(x, y, color) {
+            const fireworksContainer = document.getElementById('fireworks');
+            const particles = 60;
+            const particleColors = [color, '#ffffff', '#ffff00', '#00ffff', '#ff00ff'];
+            
+            // Основной заряд
+            const mainParticle = document.createElement('div');
+            mainParticle.className = 'firework';
+            mainParticle.style.left = x + 'px';
+            mainParticle.style.top = y + 'px';
+            mainParticle.style.background = color;
+            mainParticle.style.boxShadow = 0 0 10px ${color}, 0 0 20px ${color};
+            
+            // Анимация основного заряда
+            mainParticle.animate([
+                { opacity: 1, transform: 'scale(1)' },
+                { opacity: 0, transform: 'scale(0)' }
+            ], {
+                duration: 800,
+                easing: 'ease-out'
+            });
+            
+            fireworksContainer.appendChild(mainParticle);
+            
+            // Создаем частицы салюта
+            for (let i = 0; i < particles; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework';
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 3;
+                    const distance = 50 + Math.random() * 150;
+                    
+                    const animation = particle.animate([
+                        {
+                            opacity: 1,
+                            transform: 'translate(0, 0) scale(1)',
+                            boxShadow: 0 0 10px ${particle.style.background}
+                        },
+                        {
+                            opacity: 0,
+                            transform: translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0),
+                            boxShadow: 0 0 20px ${particle.style.background}
+                        }
+                    ], {
+                        duration: 1500 + Math.random() * 1000,
+                        easing: 'ease-out'
+                    });
+                    
+                    fireworksContainer.appendChild(particle);
+                    
+                    animation.onfinish = () => {
+                        particle.remove();
+                    };
+                }, i * 20);
+            }
+            
+            // Удаляем основной заряд после анимации
+            setTimeout(() => {
+                mainParticle.remove();
+            }, 800);
+        }
+
+elvira, [22.12.2025 21:11]
+// Запускаем салют на последнем экране
+        function startFireworks() {
+            const colors = ['#ff4081', '#00ffff', '#ffff00', '#ff00ff', '#00ff00', '#ff8000'];
+            
+            // Первый салют сразу
+            createFirework(
+                window.innerWidth * 0.3,
+                window.innerHeight * 0.4,
+                colors[0]
+            );
+            
+            // Салюты по таймеру
+            const interval = setInterval(() => {
+                const x = 100 + Math.random() * (window.innerWidth - 200);
+                const y = 100 + Math.random() * (window.innerHeight - 200);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                createFirework(x, y, color);
+                
+                // Дополнительные салюты
+                setTimeout(() => {
+                    createFirework(
+                        x + 50 - Math.random() * 100,
+                        y + 50 - Math.random() * 100,
+                        colors[Math.floor(Math.random() * colors.length)]
+                    );
+                }, 200);
+                
+            }, 800);
+            
+            return interval;
+        }
+
+        let fireworksInterval;
+
+        // Запуск сайта (скрытие попапа)
+        function startSite() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('screen1').classList.add('active');
+        }
+
+        // Переход между экранами
+        function nextScreen(n) {
+            // Скрываем все экраны
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Показываем нужный экран
+            const nextScreen = document.getElementById('screen' + n);
+            nextScreen.classList.add('active');
+            
+            // Запускаем салют на последнем экране
+            if (n === 12) {
+                if (fireworksInterval) {
+                    clearInterval(fireworksInterval);
+                }
+                fireworksInterval = startFireworks();
+            } else {
+                if (fireworksInterval) {
+                    clearInterval(fireworksInterval);
+                }
+            }
+        }
+
+        // Инициализация при загрузке
+        window.onload = function() {
+            createHearts();
+        };
+    </script>
 </body>
 </html>
